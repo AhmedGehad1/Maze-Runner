@@ -1,6 +1,7 @@
 import time
 import numpy as np
 from collections import deque
+import seaborn as sns
 import scipy.io as sio
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -38,7 +39,7 @@ def planner(map, start_row, start_column):
     while queue:
         next_queue = deque()
         current_layer = []
-        current_value += 10  # Increase step value by 10
+        current_value += 1  # Increase step value by 1
         
         for _ in range(len(queue)):
             r, c = queue.popleft()
@@ -162,23 +163,60 @@ if __name__ == "__main__":
         
         # Measure time needed to solve the maze.
         t_start = time.perf_counter()
-        value_map, trajectory, propagation_steps = planner(maze_map, 45, 4)
+        # value_map, trajectory, propagation_steps = planner(maze_map, 45, 4)
+        value_map, trajectory, propagation_steps = planner(maze_map, 1, 1)
         t_end = time.perf_counter()
         elapsed = t_end - t_start
         print(f"Time needed to solve maze: {elapsed:.6f} seconds\n")
-        
-        # # Print the value map (matrix)
-        # print("Value Map (Matrix):")
-        # for row in value_map:
-        #     print(row)
-        
-        # # Print the trajectory array.
-        # print("\nTrajectory Array:")
-        # print(trajectory)
+
+        # Save the value map and trajectory to a file
+        with open("output.csv", "w") as file:
+            # Write the value map (matrix)
+            file.write("Value Map (Matrix):\n")
+            for row in value_map:
+                file.write(f"{row}\n")
+
+            # Write the trajectory array
+            file.write("\nTrajectory Array:\n")
+            for step in trajectory:
+                file.write(f"{step}\n")
+
+        print("Output saved to 'output.csv'")
+
+
+        # Display the value map as a heatmap with the optimal path highlighted
+
+        plt.figure(figsize=(8, 8))
+        plt.title("Heatmap of Value Map with Optimal Path")
+
+        # Convert the value map to a numpy array for visualization
+        heatmap = np.array(value_map, dtype=np.uint8)
+
+        # Create a mask for the trajectory to overlay the path
+        path_mask = np.zeros_like(heatmap, dtype=bool)
+        for step in trajectory:
+            path_mask[step[0], step[1]] = True
+
+        # Plot the heatmap using seaborn
+        ax = sns.heatmap(heatmap, annot=True, fmt="d", cmap="YlGnBu", cbar=False, linewidths=0.5, linecolor='black')
+
+        # Overlay the optimal path as a line
+        if trajectory:
+            traj_y, traj_x = zip(*trajectory)
+            plt.plot(
+            [x + 0.5 for x in traj_x],  # Shift x-coordinates to the center of the cells
+            [y + 0.5 for y in traj_y],  # Shift y-coordinates to the center of the cells
+            color='red', linewidth=2, marker='o', markersize=4, label="Optimal Path"
+            )
+
+        plt.legend(loc="upper right")
+        plt.axis('off')
+        plt.show()
         
         # Find goal position (cell with value 2)
         goal_pos = next((r, row.index(2)) for r, row in enumerate(value_map) if 2 in row)
-        start = (45, 4)
+        # start = (45, 4)
+        start = (1, 1)
         original_map = np.array(maze_map)
         
         # Build the two-panel figure: static and animation.
@@ -189,6 +227,9 @@ if __name__ == "__main__":
         
         plt.tight_layout()
         plt.show()
-        
+
     except Exception as e:
         print(f"Error: {e}")
+
+
+
