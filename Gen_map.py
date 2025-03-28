@@ -66,7 +66,7 @@ def bfs_farthest(maze, start):
 
 if __name__ == "__main__":
     # Generate a new maze with larger dimensions: 51 rows x 71 cols
-    maze = generate_maze(25, 20)
+    maze = generate_maze(20, 25)
     start = (1, 1)
     goal = bfs_farthest(maze, start)
     maze[goal] = 2  # Mark goal cell with 2
