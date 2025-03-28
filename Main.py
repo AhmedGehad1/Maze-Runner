@@ -9,7 +9,7 @@ import function as f  # This file contains planner, build_figure, animate_soluti
 if __name__ == "__main__":
     try:
         # Load maze data from the .mat file.
-        mat_data = sio.loadmat('300_300_maze.mat')
+        mat_data = sio.loadmat('maze.mat')
         maze_map = mat_data['map'].tolist()
         original_map = np.array(maze_map)
         
