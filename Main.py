@@ -12,31 +12,48 @@ if __name__ == "__main__":
         mat_data = sio.loadmat('maze.mat')
         maze_map = mat_data['map'].tolist()
         original_map = np.array(maze_map)
+
+        # Ask user whether to type the start position or select it by clicking.
+        choice = input("Type '1' to enter the start position manually, or '2' to select by clicking on the maze: ").strip()
         
-        # Let the user select a start position by clicking on the maze.
-        valid_start = False
-        while not valid_start:
-            plt.figure(figsize=(8, 8))
-            cmap = mcolors.ListedColormap(['white', 'black', 'green', 'red'])
-            plt.imshow(original_map, cmap=cmap, interpolation='none')
-            plt.title("Click on the maze to select the start position")
-            plt.axis('off')
-            click = plt.ginput(1, timeout=0)
-            plt.close()
-            
-            if not click:
-                print("No start position selected. Exiting.")
-                exit()
-            # Convert click coordinates (x, y) to maze indices (row, column)
-            x, y = click[0]
-            start = (int(round(y)), int(round(x)))
-            
-            # Check if the clicked cell is a barrier (value 1)
+        if choice == '1':
+            # User inputs the start position manually.
+            row = input("Enter start row index: ").strip()
+            col = input("Enter start column index: ").strip()
+            start = (int(row), int(col))
+            # Check if the selected cell is a barrier.
             if maze_map[start[0]][start[1]] == 1:
-                print("The selected cell is a barrier. Click on another point that is not a barrier.")
-            else:
-                valid_start = True
-                print(f"Selected start position: {start}")
+                print("The selected cell is a barrier. Please re-run and choose a valid start position.")
+                exit()
+            print(f"Selected start position: {start}")
+        elif choice == '2':
+            # Let the user select a start position by clicking on the maze.
+            valid_start = False
+            while not valid_start:
+                plt.figure(figsize=(8, 8))
+                cmap = mcolors.ListedColormap(['white', 'black', 'green', 'red'])
+                plt.imshow(original_map, cmap=cmap, interpolation='none')
+                plt.title("Click on the maze to select the start position")
+                plt.axis('off')
+                click = plt.ginput(1, timeout=0)
+                plt.close()
+                
+                if not click:
+                    print("No start position selected. Exiting.")
+                    exit()
+                # Convert click coordinates (x, y) to maze indices (row, column)
+                x, y = click[0]
+                start = (int(round(y)), int(round(x)))
+                
+                # Check if the clicked cell is a barrier (value 1)
+                if maze_map[start[0]][start[1]] == 1:
+                    print("The selected cell is a barrier. Click on another point that is not a barrier.")
+                else:
+                    valid_start = True
+                    print(f"Selected start position: {start}")
+        else:
+            print("Invalid choice. Exiting.")
+            exit()
 
         # Measure time needed to solve the maze.
         t_start = time.perf_counter()
@@ -57,7 +74,7 @@ if __name__ == "__main__":
         plt.tight_layout()
         plt.show()
 
-        # Save the value map and trajectory to a file
+        # Save the value map and trajectory to a file.
         with open("output.csv", "w") as file:
             file.write("Value Map (Matrix):\n")
             for row in value_map:
