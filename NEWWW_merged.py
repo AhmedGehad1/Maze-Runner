@@ -30,8 +30,7 @@ def planner(map, start_row, start_column):
     
     # Initialize wavefront propagation (8-connectivity)
     queue = deque([goal_pos])
-    directions = [(-1,0), (0,1), (1,0), (0,-1),
-                  (-1,1), (1,1), (1,-1), (-1,-1)]
+    directions = [(-1,0), (0,1), (1,0), (0,-1),(-1,1), (1,1), (1,-1), (-1,-1)]
     propagation_steps = []
     current_value = 2
     propagation_steps.append(([goal_pos], current_value))
@@ -61,8 +60,7 @@ def planner(map, start_row, start_column):
         return value_map, [], propagation_steps
     trajectory.append([current_r, current_c])
     
-    priority_directions = [(-1,0), (0,1), (1,0), (0,-1),
-                           (-1,1), (1,1), (1,-1), (-1,-1)]
+    priority_directions = [(-1,0), (0,1), (1,0), (0,-1), (-1,1), (1,1), (1,-1), (-1,-1)]
     while True:
         current_val = value_map[current_r][current_c]
         if current_val == 2:
@@ -151,19 +149,18 @@ def animate_solution(ax_anim, original_map, propagation_steps, trajectory, start
             return line,
     
     total_frames = len(propagation_steps) + len(trajectory)
-    ani = animation.FuncAnimation(img.figure, update, frames=range(total_frames),
-                                  interval=0, blit=True, repeat=False)
+    ani = animation.FuncAnimation(img.figure, update, frames=range(total_frames), interval=0, blit=True, repeat=False)
     return ani
 
 if __name__ == "__main__":
     try:
         # Load maze data from the .mat file.
-        mat_data = sio.loadmat('300_300_maze.mat')
+        mat_data = sio.loadmat('C:/Users/omara/OneDrive/Desktop/dataanalytics midterm project/New folder/Maze-Runner/300_300_maze.mat')
         maze_map = mat_data['map'].tolist()
-        
+        start = (45, 4)
         # Measure time needed to solve the maze.
         t_start = time.perf_counter()
-        value_map, trajectory, propagation_steps = planner(maze_map, 45, 4)
+        value_map, trajectory, propagation_steps = planner(maze_map, start[0], start[1])
         # value_map, trajectory, propagation_steps = planner(maze_map, 1, 1)
         t_end = time.perf_counter()
         elapsed = t_end - t_start
@@ -173,7 +170,6 @@ if __name__ == "__main__":
 
         # Find goal position (cell with value 2)
         goal_pos = next((r, row.index(2)) for r, row in enumerate(value_map) if 2 in row)
-        start = (45, 4)
         # start = (1, 1)
         original_map = np.array(maze_map)
         
